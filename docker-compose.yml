@@ -1,7 +1,18 @@
 version: "3.2"
 services:
     rabbitmq-server:
-        build: ./rabbitmq-server
+            image: rabbitmq
+            hostname: "rabbitmq-server"
+            environment:
+                RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+                RABBITMQ_DEFAULT_USER: "guest"
+                RABBITMQ_DEFAULT_PASS: "guest"
+                RABBITMQ_DEFAULT_VHOST: "/"
+            ports:
+                - "15672:15672"
+                - "5672:5672"
+            labels:
+                NAME: "rabbitmq-server"
 
     python-service:
         build: ./python-service
@@ -24,6 +35,8 @@ services:
         tty: true
         volumes:
             - './go-service:/go-service'
+    redis:
+        image: redis
 
 # Host volumes used to store code.
 volumes:

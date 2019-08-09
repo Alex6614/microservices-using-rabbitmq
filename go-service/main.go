@@ -26,8 +26,8 @@ func main() {
 	// Make sure we close the channel whenever the program is about to exit.
 	defer ch.Close()
 	
-	exchangeName := "user_updates"
-	bindingKey   := "user.profile.*"
+	exchangeName := "product_order"
+	bindingKey   := "product.order.*"
 
 	// Create the exchange if it doesn't already exist.
 	err = ch.ExchangeDeclare(
@@ -82,7 +82,7 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received message: %s", d.Body)
+			log.Printf("Received product order: %s", d.Body)
 
 			// Update the user data on the service's 
 			// associated datastore using a local transaction...

@@ -1,16 +1,22 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
-from services.user_event_handler import emit_user_profile_update
+from redis import Redis
+from services.product_event_handler import emit_product_order
 
 app = Flask(__name__)
+redis = Redis(host='redis', port=6379)
 
-@app.route('/users/<int:user_id>', methods=['POST'])
-def update(user_id):
-    new_name = request.form['full_name']
+@app.route('/create', methods=['POST'])
+def create():
+	name = request.form['name']
+	price = request.form['price']
+	redis.mset({name: price})
+	return jsonify({'name': name, 'price': price}), 201
 
-    # Update the user in the datastore using a local transaction...
-    
-    emit_user_profile_update(user_id, {'full_name': new_name})
-
-    return jsonify({'full_name': new_name}), 201
+@app.route('/buy', methods=['POST'])
+def buy():
+	name = request.form['name']
+	price = redis.get(name)
+	emit_product_order(name)
+	return jsonify({'receipt': 'Thanks for ordering! Your total comes to: ' + str(price)}), 200
